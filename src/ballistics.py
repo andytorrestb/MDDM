@@ -15,6 +15,41 @@ def calculate_initial_velocity(C_d, rho_g, d_p, u_g, gravity, time_step):
     
     return v_0
 
+def calculate_trajectory_lane2012(x_0, y_0, s_0, b, g, v_0, max_distance):
+    """
+    Calculate the trajectory of a particle based on the ballistics model presented in Lane 2012.
+
+    :param x_0: Initial vertical position (usually 0 for surface launch).
+    :param y_0: Initial horizontal position (initial distance from plume center).
+    :param s_0: Derivative of trajectory at the starting point (slope of the trajectory).
+    :param b: Curve-fitting parameter affecting the trajectory curvature.
+    :param g: Gravitational acceleration (1.62 m/s^2 for the Moon).
+    :param v_0: Horizontal velocity (assumed constant).
+    :param max_distance: Maximum horizontal distance to compute (m).
+    :return: List of (x, y) coordinates representing the trajectory.
+    """
+    trajectory = []
+    y = y_0
+    x = x_0
+    step_size = 0.1
+    while x >= 0:
+        # Avoid division by zero when y == y_0
+        if abs(y - y_0) < 1e-6:
+            y += step_size
+            continue
+
+        # Calculate vertical position using Lane 2012's formula
+        x = (x_0 + s_0 * (y - y_0)) + (b * (x_0 - s_0 * y_0) / (y - y_0)) - (g * (y - y_0)**2) / (2 * v_0**2)
+        
+        # Stop if the particle reaches the surface
+        if x < 0:
+            break
+        
+        trajectory.append((y, x))
+        y += 0.1  # Increment horizontal position by 0.1 m (or a finer resolution as needed)
+    
+    return trajectory
+
 def calculate_launch_angle(plume_velocity, stagnation_velocity, radial_distance, max_distance):
     """
     Calculate the initial launch angle of particles based on the plume velocity and surface characteristics.
@@ -39,7 +74,7 @@ def calculate_launch_angle(plume_velocity, stagnation_velocity, radial_distance,
     
     return theta_deg
 
-def calculate_trajectory(v_0, launch_angle, gravity, initial_position=(0, 1), time_step=0.01, max_time=20e5):
+def calculate_trajectory(v_0, launch_angle, gravity, initial_position=(0, 0), time_step=0.01, max_time=10):
     """Compute the particle trajectory based on initial velocity, angle, and gravity."""
     x_0, y_0 = initial_position
     theta = math.radians(launch_angle)  # Convert angle to radians
