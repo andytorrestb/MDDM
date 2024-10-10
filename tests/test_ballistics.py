@@ -12,7 +12,7 @@ class TestLane2012Trajectory(unittest.TestCase):
         """Test the Lane 2012 ballistics model and plot the trajectory."""
         # Define the input parameters based on Lane 2012
         x_0 = 1         # Initial vertical position (surface level)
-        y_0 = 0         # Initial horizontal position (assumed to start at 0)
+        y_0 = 0.1         # Initial horizontal position (assumed to start at 0)
         s_0 = 0.1       # Initial slope of the trajectory (based on plume forces)
         b = 0.05        # Curve-fitting parameter to match plume behavior
         g = 1.62        # Lunar gravity in m/s^2

@@ -29,24 +29,22 @@ def calculate_trajectory_lane2012(x_0, y_0, s_0, b, g, v_0, max_distance):
     :return: List of (x, y) coordinates representing the trajectory.
     """
     trajectory = []
+    step_size = 100
+    # y = y_0 + step_size
     y = y_0
     x = x_0
-    step_size = 0.1
-    while x >= 0:
-        # Avoid division by zero when y == y_0
-        if abs(y - y_0) < 1e-6:
-            y += step_size
-            continue
+    while x > 0:
 
         # Calculate vertical position using Lane 2012's formula
-        x = (x_0 + s_0 * (y - y_0)) + (b * (x_0 - s_0 * y_0) / (y - y_0)) - (g * (y - y_0)**2) / (2 * v_0**2)
+        # print(y_0)
+        x = (x_0 + s_0 * (y - y_0)) + (b*x_0 - s_0 * y_0)*((y-y_0)/y_0 - math.log(y/y_0)) - (g * (y - y_0)**2) / (2 * v_0**2)
         
         # Stop if the particle reaches the surface
         if x < 0:
             break
         
         trajectory.append((y, x))
-        y += 0.1  # Increment horizontal position by 0.1 m (or a finer resolution as needed)
+        y += step_size  # Increment horizontal position by 0.1 m (or a finer resolution as needed)
     
     return trajectory
 
